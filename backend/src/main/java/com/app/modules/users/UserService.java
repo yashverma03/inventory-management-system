@@ -24,6 +24,7 @@ public class UserService {
       throw new RuntimeException("User already exists");
     }
     User user = new User();
+    System.out.println("Creating user: " + dto);
     // user.setEmail(dto.getEmail());
     // user.setFirstName(dto.getFirstName());
     // user.setLastName(dto.getLastName());
