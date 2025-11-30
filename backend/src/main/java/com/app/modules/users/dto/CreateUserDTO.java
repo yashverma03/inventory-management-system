@@ -2,8 +2,6 @@ package com.app.modules.users.dto;
 
 import com.app.modules.users.enums.UserRoleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,7 +33,6 @@ public class CreateUserDTO {
 
     @Schema(description = "User role in the system", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
             "admin", "manager" })
-    @Enumerated(EnumType.STRING)
     @NotNull(message = "Role is required")
     private UserRoleEnum role;
 }
