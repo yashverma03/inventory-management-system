@@ -1,9 +1,11 @@
 package com.app.modules.jwt.filters;
 
 import com.app.common.annotations.IsPublic;
+import com.app.common.annotations.Roles;
 import com.app.common.exception.ErrorResponseUtil;
 import com.app.modules.jwt.JwtService;
 import com.app.modules.jwt.records.JwtPayload;
+import com.app.modules.users.enums.UserRoleEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,6 +85,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       // Set user in request attribute (for easy access in controllers)
       request.setAttribute("user", tokenPayload);
+
+      // Check role-based authorization if @Roles annotation is present
+      try {
+        HandlerExecutionChain handlerChain = handlerMapping.getHandler(request);
+        if (handlerChain != null && handlerChain.getHandler() instanceof HandlerMethod) {
+          HandlerMethod handlerMethod = (HandlerMethod) handlerChain.getHandler();
+
+          // Check for @Roles annotation on method or class
+          Roles rolesAnnotation = handlerMethod.getMethodAnnotation(Roles.class);
+          if (rolesAnnotation == null) {
+            rolesAnnotation = handlerMethod.getBeanType().getAnnotation(Roles.class);
+          }
+
+          if (rolesAnnotation != null) {
+            // Check if user's role is in the allowed roles
+            UserRoleEnum[] allowedRoles = rolesAnnotation.value();
+            UserRoleEnum userRole = tokenPayload.role();
+
+            boolean hasRequiredRole = Arrays.asList(allowedRoles).contains(userRole);
+            if (!hasRequiredRole) {
+              throw new ResponseStatusException(
+                  HttpStatus.FORBIDDEN,
+                  "Access denied. Required role(s): " + Arrays.toString(allowedRoles));
+            }
+          }
+        }
+      } catch (ResponseStatusException e) {
+        throw e;
+      } catch (Exception e) {
+        // If we can't determine the handler, continue without role check
+      }
 
       // Set authentication in SecurityContext
       List<SimpleGrantedAuthority> authorities = Collections.singletonList(
