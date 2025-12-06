@@ -10,6 +10,7 @@ echo ""
 
 # Function to start Spring Boot
 start_spring_boot() {
+    kill_port 3000
     ./mvnw spring-boot:run &
     SPRING_PID=$!
 }
@@ -26,20 +27,8 @@ kill_port() {
   fi
 }
 
-# Kill processes on specified ports
-kill_port 3000
-
 # Start Spring Boot initially
 start_spring_boot
-
-# Cleanup on exit
-cleanup() {
-    echo ""
-    echo "🛑 Stopping Spring Boot..."
-    kill $SPRING_PID 2>/dev/null
-    exit
-}
-trap cleanup SIGINT SIGTERM
 
 # Watch and restart loop
 LAST_CHECK=$(date +%s)
