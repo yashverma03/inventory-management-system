@@ -29,7 +29,7 @@ trap cleanup SIGINT SIGTERM
 # Watch and restart loop
 LAST_CHECK=$(date +%s)
 while true; do
-    sleep 0.1
+    sleep 0.5
 
     # Check if any source files changed
     if find src/ -type f \( -name "*.java" -o -name "*.properties" -o -name "*.yml" -o -name "*.yaml" \) -newermt "@$LAST_CHECK" 2>/dev/null | grep -q .; then
