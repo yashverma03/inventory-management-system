@@ -2,8 +2,12 @@ package com.app.modules.users;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.app.modules.users.entities.User;
 import com.app.modules.users.dto.CreateUserDTO;
 import com.app.modules.users.repositories.UserRepository;
@@ -18,19 +22,20 @@ public class UserService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private ModelMapper modelMapper;
+
+  private String hashPassword(String password) {
+    return passwordEncoder.encode(password);
+  }
+
   public User createUser(CreateUserDTO dto) {
     Optional<User> existingUser = userRepository.findByEmail(dto.getEmail());
     if (existingUser.isPresent()) {
-      throw new RuntimeException("User already exists");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
     }
-    User user = new User();
-    System.out.println("Creating user: " + dto);
-    // user.setEmail(dto.getEmail());
-    // user.setFirstName(dto.getFirstName());
-    // user.setLastName(dto.getLastName());
-    // user.setPassword(dto.getPassword());
-    // user.setRole(dto.getRole());
-    // userRepository.save(user);
-    return user;
+    User user = modelMapper.map(dto, User.class);
+    user.setPassword(hashPassword(dto.getPassword()));
+    return userRepository.save(user);
   }
 }

@@ -1,5 +1,6 @@
 package com.app.modules.users.dto;
 
+import com.app.common.annotations.IsEnum;
 import com.app.modules.users.enums.UserRoleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -32,7 +33,8 @@ public class CreateUserDTO {
     private String password;
 
     @Schema(description = "User role in the system", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
-            "admin", "manager" })
+            "ADMIN", "MANAGER" })
     @NotNull(message = "Role is required")
+    @IsEnum(value = UserRoleEnum.class)
     private UserRoleEnum role;
 }

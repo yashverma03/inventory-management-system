@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum UserRoleEnum {
-  ADMIN("admin"),
-  MANAGER("manager");
+  ADMIN("ADMIN"),
+  MANAGER("MANAGER");
 
   private final String value;
 
@@ -28,6 +28,6 @@ public enum UserRoleEnum {
         return role;
       }
     }
-    throw new IllegalArgumentException("Unknown role: " + value + ". Allowed values: admin, manager");
+    throw new IllegalArgumentException("Unknown role: " + value + ". Allowed values: ADMIN, MANAGER");
   }
 }

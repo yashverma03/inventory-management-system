@@ -1,8 +1,12 @@
 package com.app.common.exception;
 
 import com.app.common.dto.ErrorResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +32,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
   }
 
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    String message = ex.getMessage();
+    ErrorResponse errorResponse = new ErrorResponse(
+        "Invalid request body",
+        message);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
     Map<String, String> errors = new HashMap<>();
@@ -48,13 +61,34 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
-  @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+    Map<String, String> errors = new HashMap<>();
+    for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+      String fieldName = violation.getPropertyPath().toString();
+      String errorMessage = violation.getMessage();
+      errors.put(fieldName, errorMessage);
+    }
+
+    String errorMessage = errors.entrySet().stream()
+        .map(entry -> entry.getKey() + ": " + entry.getValue())
+        .collect(Collectors.joining(", "));
+
     ErrorResponse errorResponse = new ErrorResponse(
-        ex.getMessage() != null ? ex.getMessage() : "An error occurred",
-        ex.getClass().getSimpleName());
+        "Validation failed",
+        errorMessage);
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+  }
+
+  @ExceptionHandler(InvalidDataAccessResourceUsageException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidDataAccessResourceUsageException(
+      InvalidDataAccessResourceUsageException ex) {
+    String message = ex.getMessage();
+    ErrorResponse errorResponse = new ErrorResponse(
+        "Database error",
+        message);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 
   @ExceptionHandler(Exception.class)

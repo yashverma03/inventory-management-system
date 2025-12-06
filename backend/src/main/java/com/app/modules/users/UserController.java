@@ -26,8 +26,7 @@ public class UserController {
   @Operation(summary = "Create a new user", description = "Creates a new user account with the provided information. Email must be unique.")
   @PostMapping
   public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDTO dto) {
-    // return
-    // User user = userService.createUser(dto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    User user = userService.createUser(dto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 
 @MappedSuperclass
 public abstract class BaseEntity {
@@ -23,6 +24,12 @@ public abstract class BaseEntity {
 
   @Column(name = "deleted_at", nullable = true)
   private LocalDateTime deletedAt;
+
+  @PrePersist
+  protected void onPersist() {
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
 
   @PreUpdate
   protected void onUpdate() {
