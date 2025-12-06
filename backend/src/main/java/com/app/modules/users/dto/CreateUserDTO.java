@@ -32,7 +32,7 @@ public class CreateUserDTO {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @Schema(description = "User role in the system", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
+    @Schema(description = "User role in the system", example = "ADMIN", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {
             "ADMIN", "MANAGER" })
     @NotNull(message = "Role is required")
     @IsEnum(value = UserRoleEnum.class)

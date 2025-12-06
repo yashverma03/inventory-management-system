@@ -1,5 +1,8 @@
 package com.app.modules.users.entities;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.app.common.entities.BaseEntity;
 import com.app.modules.users.enums.UserRoleEnum;
 import jakarta.persistence.Column;
@@ -27,7 +30,8 @@ public class User extends BaseEntity {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "role", nullable = false)
+  @Column(name = "role", nullable = false, columnDefinition = "user_role_enum")
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Enumerated(EnumType.STRING)
   private UserRoleEnum role;
 }
