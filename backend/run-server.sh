@@ -14,6 +14,21 @@ start_spring_boot() {
     SPRING_PID=$!
 }
 
+# Function to kill process running on a specific port
+kill_port() {
+  local PORT=$1
+  PID=$(sudo lsof -ti tcp:$PORT)
+  if [ -n "$PID" ]; then
+    echo "Killing process on port $PORT (PID: $PID)"
+    sudo kill -9 $PID
+  else
+    echo "No process running on port $PORT"
+  fi
+}
+
+# Kill processes on specified ports
+kill_port 3000
+
 # Start Spring Boot initially
 start_spring_boot
 

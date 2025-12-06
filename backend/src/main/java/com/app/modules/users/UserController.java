@@ -1,5 +1,6 @@
 package com.app.modules.users;
 
+import com.app.common.annotations.IsPublic;
 import com.app.modules.users.dto.CreateUserDTO;
 import com.app.modules.users.entities.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ public class UserController {
   @Autowired
   private UserService userService;
 
+  @IsPublic
   @Operation(summary = "Create a new user", description = "Creates a new user account with the provided information. Email must be unique.")
   @PostMapping
   public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDTO dto) {
