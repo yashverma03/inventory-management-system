@@ -1,5 +1,7 @@
 package com.app.modules.inventory.entities;
 
+import java.math.BigDecimal;
+
 import com.app.common.entities.BaseEntity;
 import com.app.modules.users.entities.User;
 
@@ -30,14 +32,14 @@ public class Inventory extends BaseEntity {
   @Column(name = "quantity", nullable = false)
   private Integer quantity;
 
-  @Column(name = "price", nullable = false)
-  private Double price;
+  @Column(name = "price", nullable = false, precision = 16, scale = 2)
+  private BigDecimal price;
 
   @Column(name = "category", nullable = false)
   private String category;
 
   // Relations
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
   private User user;
 }

@@ -44,6 +44,7 @@ public class User extends BaseEntity {
   private UserRoleEnum role;
 
   // Relations
+  @JsonIgnore
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Inventory> inventories;
 }
