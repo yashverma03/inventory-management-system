@@ -5,10 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PreUpdate;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 
+@Data
 @MappedSuperclass
 public abstract class BaseEntity {
   @Id

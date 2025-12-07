@@ -1,7 +1,8 @@
 package com.app.common.resolvers;
 
 import com.app.common.annotations.LoggedInUser;
-import com.app.modules.jwt.records.JwtPayload;
+import com.app.modules.jwt.classes.JwtPayload;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

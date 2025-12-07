@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.app.modules.jwt.records.JwtPayload;
+import com.app.modules.jwt.classes.JwtPayload;
 import com.app.modules.users.enums.UserRoleEnum;
 
 import io.jsonwebtoken.Claims;
@@ -36,8 +36,8 @@ public class JwtService {
   public String generateToken(JwtPayload jwtPayload) {
     Date expiryDate = new Date(System.currentTimeMillis() + expiryTimeInMilliseconds);
     return Jwts.builder()
-        .claim("userId", jwtPayload.userId())
-        .claim("role", jwtPayload.role())
+        .claim("userId", jwtPayload.getUserId())
+        .claim("role", jwtPayload.getRole())
         .expiration(expiryDate)
         .issuedAt((new Date()))
         .signWith(this.key)

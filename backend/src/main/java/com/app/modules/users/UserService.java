@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.app.modules.users.entities.User;
-import com.app.modules.users.dto.CreateUserDTO;
+import com.app.modules.jwt.JwtService;
+import com.app.modules.jwt.classes.JwtPayload;
+import com.app.modules.users.dto.CreateUserDto;
+import com.app.modules.users.dto.LoginResponseDto;
+import com.app.modules.users.dto.LoginUserDto;
 import com.app.modules.users.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,17 +29,49 @@ public class UserService {
   @Autowired
   private ModelMapper modelMapper;
 
+  @Autowired
+  private JwtService jwtService;
+
   private String hashPassword(String password) {
     return passwordEncoder.encode(password);
   }
 
-  public User createUser(CreateUserDTO dto) {
-    Optional<User> existingUser = userRepository.findByEmail(dto.getEmail());
+  private boolean isPasswordValid(String password, String hashedPassword) {
+    return passwordEncoder.matches(password, hashedPassword);
+  }
+
+  private Optional<User> getUserByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
+
+  private User getUserByEmailOrThrow(String email) {
+    Optional<User> existingUser = getUserByEmail(email);
+    if (existingUser.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    }
+    return existingUser.get();
+  }
+
+  public User createUser(CreateUserDto dto) {
+    Optional<User> existingUser = getUserByEmail(dto.getEmail());
     if (existingUser.isPresent()) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
     }
     User user = modelMapper.map(dto, User.class);
     user.setPassword(hashPassword(dto.getPassword()));
     return userRepository.save(user);
+  }
+
+  public LoginResponseDto loginUser(LoginUserDto dto) {
+    String email = dto.getEmail();
+    String password = dto.getPassword();
+    User user = getUserByEmailOrThrow(email);
+    boolean isPasswordValid = isPasswordValid(password, user.getPassword());
+    if (!isPasswordValid) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+    }
+    JwtPayload jwtPayload = new JwtPayload(user.getId(), user.getRole());
+    String token = jwtService.generateToken(jwtPayload);
+    return new LoginResponseDto(token, user);
   }
 }

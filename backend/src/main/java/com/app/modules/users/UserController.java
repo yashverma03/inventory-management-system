@@ -1,7 +1,9 @@
 package com.app.modules.users;
 
 import com.app.common.annotations.IsPublic;
-import com.app.modules.users.dto.CreateUserDTO;
+import com.app.modules.users.dto.CreateUserDto;
+import com.app.modules.users.dto.LoginResponseDto;
+import com.app.modules.users.dto.LoginUserDto;
 import com.app.modules.users.entities.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,8 +27,16 @@ public class UserController {
   @IsPublic
   @Operation(summary = "Create a new user", description = "Creates a new user account with the provided information. Email must be unique.")
   @PostMapping
-  public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDTO dto) {
+  public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserDto dto) {
     User user = userService.createUser(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  }
+
+  @IsPublic
+  @Operation(summary = "Login a user")
+  @PostMapping("/login")
+  public ResponseEntity<Object> loginUser(@Valid @RequestBody LoginUserDto dto) {
+    LoginResponseDto data = userService.loginUser(dto);
+    return ResponseEntity.status(HttpStatus.OK).body(data);
   }
 }

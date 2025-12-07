@@ -4,7 +4,7 @@ import com.app.common.annotations.IsPublic;
 import com.app.common.annotations.Roles;
 import com.app.common.exception.ErrorResponseUtil;
 import com.app.modules.jwt.JwtService;
-import com.app.modules.jwt.records.JwtPayload;
+import com.app.modules.jwt.classes.JwtPayload;
 import com.app.modules.users.enums.UserRoleEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -101,7 +101,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           if (rolesAnnotation != null) {
             // Check if user's role is in the allowed roles
             UserRoleEnum[] allowedRoles = rolesAnnotation.value();
-            UserRoleEnum userRole = tokenPayload.role();
+            UserRoleEnum userRole = tokenPayload.getRole();
 
             boolean hasRequiredRole = Arrays.asList(allowedRoles).contains(userRole);
             if (!hasRequiredRole) {
@@ -119,7 +119,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       // Set authentication in SecurityContext
       List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-          new SimpleGrantedAuthority("ROLE_" + tokenPayload.role().getValue().toUpperCase()));
+          new SimpleGrantedAuthority("ROLE_" + tokenPayload.getRole().getValue().toUpperCase()));
 
       UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
           tokenPayload,

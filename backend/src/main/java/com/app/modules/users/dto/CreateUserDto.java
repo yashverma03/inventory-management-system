@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "DTO for creating a new user account")
-public class CreateUserDTO {
+public class CreateUserDto {
 
     @Schema(description = "User email address (must be unique)", example = "john.doe@example.com", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 255)
     @NotBlank(message = "Email is required")
