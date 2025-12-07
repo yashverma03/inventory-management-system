@@ -1,0 +1,25 @@
+START TRANSACTION;
+
+CREATE TABLE IF NOT EXISTS inventories (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(1000),
+  quantity INTEGER NOT NULL DEFAULT 0,
+  price DECIMAL(16, 2) NOT NULL DEFAULT 0.00,
+  category VARCHAR(255),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMP
+);
+
+COMMIT;
+
+/*
+Down migration:
+
+START TRANSACTION;
+DROP TABLE IF EXISTS inventories;
+DELETE FROM flyway_schema_history WHERE script = 'V2__create_inventories_table.sql';
+COMMIT;
+*/

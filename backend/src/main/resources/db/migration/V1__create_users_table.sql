@@ -1,4 +1,3 @@
--- Create user_role enum type
 START TRANSACTION;
 
 CREATE TYPE user_role_enum AS ENUM ('ADMIN', 'MANAGER');
