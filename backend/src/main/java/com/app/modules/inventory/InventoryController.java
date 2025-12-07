@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -57,7 +58,7 @@ public class InventoryController {
   @PostMapping
   public ResponseEntity<MessageResponse> createInventory(
       @Valid @RequestBody CreateInventoryDto dto,
-      @LoggedInUser JwtPayload jwtPayload) {
+      @Parameter(hidden = true) @LoggedInUser JwtPayload jwtPayload) {
     inventoryService.createInventory(dto, jwtPayload.getUserId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(new MessageResponse("Inventory created successfully"));

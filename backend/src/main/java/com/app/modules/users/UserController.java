@@ -9,6 +9,7 @@ import com.app.modules.users.dto.LoginResponseDto;
 import com.app.modules.users.dto.LoginUserDto;
 import com.app.modules.users.entities.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class UserController {
   @Operation(summary = "Get the current user")
   @GetMapping("/me")
   public ResponseEntity<Object> getUser(
-    @LoggedInUser JwtPayload jwtPayload
+    @Parameter(hidden = true) @LoggedInUser JwtPayload jwtPayload
   ) {
     GetUserResponseDto data = userService.getUser(jwtPayload);
     return ResponseEntity.status(HttpStatus.OK).body(data);
