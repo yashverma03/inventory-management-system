@@ -1,13 +1,18 @@
 package com.app.modules.inventory;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.app.modules.inventory.dto.CreateInventoryDto;
+import com.app.modules.inventory.dto.UpdateInventoryDto;
 import com.app.modules.inventory.entities.Inventory;
 import com.app.modules.inventory.repositories.InventoryRepository;
 
@@ -27,6 +32,9 @@ public class InventoryService {
 
   @Autowired
   private EntityManager entityManager;
+
+  @Autowired
+  private ModelMapper modelMapper;
 
   private List<Inventory> get(Long id) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -63,5 +71,32 @@ public class InventoryService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found");
     }
     return inventories.get(0);
+  }
+
+  public void createInventory(CreateInventoryDto dto, Long userId) {
+    Inventory inventory = modelMapper.map(dto, Inventory.class);
+    inventory.setUserId(userId);
+    inventoryRepository.save(inventory);
+  }
+
+  public void updateInventory(Long id, UpdateInventoryDto dto) {
+    Optional<Inventory> optionalInventory = inventoryRepository.findById(id);
+    if (optionalInventory.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found");
+    }
+    Inventory inventory = optionalInventory.get();
+    modelMapper.map(dto, inventory);
+    inventoryRepository.save(inventory);
+  }
+
+  public void deleteInventory(Long id) {
+    Optional<Inventory> optionalInventory = inventoryRepository.findById(id);
+    if (optionalInventory.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventory not found");
+    }
+
+    Inventory inventory = optionalInventory.get();
+    inventory.setDeletedAt(LocalDateTime.now());
+    inventoryRepository.save(inventory);
   }
 }
