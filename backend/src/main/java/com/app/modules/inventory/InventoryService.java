@@ -1,5 +1,6 @@
 package com.app.modules.inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +33,21 @@ public class InventoryService {
     CriteriaQuery<Inventory> criteriaQuery = criteriaBuilder.createQuery(Inventory.class);
     Root<Inventory> inventory = criteriaQuery.from(Inventory.class);
     inventory.fetch("user", JoinType.INNER);
+
+    // Build predicates list
+    List<Predicate> predicates = new ArrayList<>();
+
+    // Always filter out soft-deleted records
+    predicates.add(criteriaBuilder.isNull(inventory.get("deletedAt")));
+
+    // Add id filter if provided
     if (id != null) {
-      Predicate idPredicate = criteriaBuilder.equal(inventory.get("id"), id);
-      criteriaQuery.where(idPredicate);
+      predicates.add(criteriaBuilder.equal(inventory.get("id"), id));
     }
+
+    // Apply all predicates
+    criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
+
     Order orderBy = criteriaBuilder.desc(inventory.get("createdAt"));
     criteriaQuery.select(inventory).distinct(true).orderBy(orderBy);
     return entityManager.createQuery(criteriaQuery).getResultList();
