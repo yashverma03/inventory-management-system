@@ -1,5 +1,9 @@
 # Inventory Management System
 
+
+<img width="2290" height="1183" alt="image" src="https://github.com/user-attachments/assets/265cc58e-0b3d-411b-8e6d-1fb233153e99" />
+
+
 A comprehensive RESTful API for managing inventory items with user authentication, role-based access control, and integration with external product APIs.
 
 ## 🔧 Requirements
