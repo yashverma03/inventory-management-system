@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.app.common.annotations.LoggedInUser;
 import com.app.common.dto.MessageResponse;
 import com.app.modules.inventory.dto.CreateInventoryDto;
+import com.app.modules.inventory.dto.DummyJsonProductsResponseDto;
 import com.app.modules.inventory.dto.UpdateInventoryDto;
 import com.app.modules.inventory.entities.Inventory;
 import com.app.modules.jwt.classes.JwtPayload;
@@ -39,6 +40,13 @@ public class InventoryController {
     return ResponseEntity.ok(inventoryService.getAll(null));
   }
 
+  @Operation(summary = "Get external products from dummy JSON API", description = "Fetches products from dummy JSON API")
+  @GetMapping("/external")
+  public ResponseEntity<DummyJsonProductsResponseDto> getExternalInventory() {
+    DummyJsonProductsResponseDto response = inventoryService.getExternalInventory();
+    return ResponseEntity.ok(response);
+  }
+
   @Operation(summary = "Get an inventory by id", description = "Get an inventory by id")
   @GetMapping("/{id}")
   public ResponseEntity<Inventory> getById(@PathVariable Long id) {
@@ -70,4 +78,5 @@ public class InventoryController {
     inventoryService.deleteInventory(id);
     return ResponseEntity.ok(new MessageResponse("Inventory deleted successfully"));
   }
+
 }

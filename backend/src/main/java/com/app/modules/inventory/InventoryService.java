@@ -7,11 +7,16 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.app.modules.inventory.dto.CreateInventoryDto;
+import com.app.modules.inventory.dto.DummyJsonProductsResponseDto;
 import com.app.modules.inventory.dto.UpdateInventoryDto;
 import com.app.modules.inventory.entities.Inventory;
 import com.app.modules.inventory.repositories.InventoryRepository;
@@ -35,6 +40,12 @@ public class InventoryService {
 
   @Autowired
   private ModelMapper modelMapper;
+
+  @Autowired
+  private WebClient.Builder webClientBuilder;
+
+  @Value("${dummyJsonBaseUrl}")
+  private String dummyJsonBaseUrl;
 
   private List<Inventory> get(Long id) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -98,5 +109,39 @@ public class InventoryService {
     Inventory inventory = optionalInventory.get();
     inventory.setDeletedAt(LocalDateTime.now());
     inventoryRepository.save(inventory);
+  }
+
+  public DummyJsonProductsResponseDto getExternalInventory() {
+    try {
+      int limit = 30;
+      int skip = 0;
+
+      String url = UriComponentsBuilder
+          .fromUriString(dummyJsonBaseUrl + "/products")
+          .queryParam("limit", limit)
+          .queryParam("skip", skip)
+          .toUriString();
+
+      DummyJsonProductsResponseDto response = webClientBuilder.build()
+          .get()
+          .uri(url)
+          .retrieve()
+          .bodyToMono(DummyJsonProductsResponseDto.class)
+          .block();
+
+      if (response == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "No response from dummy JSON API");
+      }
+
+      return response;
+    } catch (WebClientResponseException e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_GATEWAY,
+          "Failed to fetch products from dummy JSON API: " + e.getMessage());
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Unexpected error while fetching external inventory: " + e.getMessage());
+    }
   }
 }
