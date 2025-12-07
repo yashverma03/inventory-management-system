@@ -12,6 +12,7 @@ import com.app.modules.users.entities.User;
 import com.app.modules.jwt.JwtService;
 import com.app.modules.jwt.classes.JwtPayload;
 import com.app.modules.users.dto.CreateUserDto;
+import com.app.modules.users.dto.GetUserResponseDto;
 import com.app.modules.users.dto.LoginResponseDto;
 import com.app.modules.users.dto.LoginUserDto;
 import com.app.modules.users.repositories.UserRepository;
@@ -52,6 +53,14 @@ public class UserService {
     return existingUser.get();
   }
 
+  private User getUserById(Long id) {
+    Optional<User> user = userRepository.findById(id);
+    if (user.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+    }
+    return user.get();
+  }
+
   public User createUser(CreateUserDto dto) {
     Optional<User> existingUser = getUserByEmail(dto.getEmail());
     if (existingUser.isPresent()) {
@@ -73,5 +82,10 @@ public class UserService {
     JwtPayload jwtPayload = new JwtPayload(user.getId(), user.getRole());
     String token = jwtService.generateToken(jwtPayload);
     return new LoginResponseDto(token, user);
+  }
+
+  public GetUserResponseDto getUser(JwtPayload jwtPayload) {
+    User user = getUserById(jwtPayload.getUserId());
+    return new GetUserResponseDto(jwtPayload, user);
   }
 }

@@ -5,6 +5,8 @@ import org.hibernate.type.SqlTypes;
 
 import com.app.common.entities.BaseEntity;
 import com.app.modules.users.enums.UserRoleEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,6 +29,7 @@ public class User extends BaseEntity {
   @Column(name = "last_name", nullable = true)
   private String lastName;
 
+  @JsonIgnore
   @Column(name = "password", nullable = false)
   private String password;
 
